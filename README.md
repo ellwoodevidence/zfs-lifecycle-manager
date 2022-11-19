@@ -63,7 +63,7 @@ Create a limited pool which will contain the storage volumes on this storage ser
 
 Only allow the deployment user (in this instance, Octopus) limited rights on the filesystem. For reference, here is documentation on delegated permissions: [zfs-allow.8 — OpenZFS documentation](https://openzfs.github.io/openzfs-docs/man/8/zfs-allow.8.html)
 
-`zfs allow octopus create,load-key,snapshot,encryption,keyformat,keylocation,userprop,compression,readonly storage-server/storage/`
+`zfs allow octopus mount,create,load-key,snapshot,encryption,keyformat,keylocation,compression,readonly,aclmode,acltype,aclinherit,xattr,userprop storage-server/storage/`
 
 This `octopus` user does not have rights to destroy ZFS datasets.
 Note that even though we have allowed `mount` through zfs, the non-sudo user cannot perform mount operations. We got around this earlier by adding the `/bin/systemctl restart zfs-mount.service` command to the sudoers file.
@@ -74,7 +74,7 @@ Confirm that you did not over-apply the rights:
 root@storage-server:~# zfs allow storage-server/storage
 ---- Permissions on storage-server/storage--------------------------
 Local+Descendent permissions:
-        user octopus create,load-key,snapshot,encryption,keyformat,keylocation,userprop,compression,readonly
+        user octopus mount,create,load-key,snapshot,encryption,keyformat,keylocation,compression,readonly,aclmode,acltype,aclinherit,xattr,userprop
 ```
 
 You will see that permissions are as you expect.
