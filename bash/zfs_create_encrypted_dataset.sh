@@ -26,6 +26,8 @@ Help()
    echo "This can be granted by adding the following to your sudoers file:"
    echo
    echo "       octopus ALL= NOPASSWD: /bin/systemctl restart zfs-mount.service"
+   echo "       octopus ALL= NOPASSWD: /usr/bin/chown -R 434400500\:434412651 /to1-s-fs-smb1/* "
+   echo "       octopus ALL= NOPASSWD: /usr/bin/setfacl -R --set-file acl_template.txt /to1-s-fs-smb1/cases/* "
    echo
    echo "Syntax: zfs_create_encrypted_dataset -p <DATASET_PARENT>"
    echo "options:"
@@ -339,6 +341,8 @@ if [ "$CREATE_CLIENT" = true ]; then
                 #################################################
                 # This requires the following to be added to the system's sudoers file:
                 #       octopus ALL= NOPASSWD: /bin/systemctl restart zfs-mount.service
+                #       octopus ALL= NOPASSWD: /usr/bin/chown -R 434400500\:434412651 /to1-s-fs-smb1/*
+                #       octopus ALL= NOPASSWD: /usr/bin/setfacl -R --set-file acl_template.txt /to1-s-fs-smb1/cases/*
 
                 echo "restarting zfs-mount.service"
                 sudo systemctl restart zfs-mount.service
