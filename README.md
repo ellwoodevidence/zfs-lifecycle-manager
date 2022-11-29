@@ -62,7 +62,7 @@ octopus ALL= NOPASSWD: /usr/bin/mkdir /storage-server/storage/*
 
 
 ### Setup ZFS Dataset Permissions
-Create a limited pool which will contain the storage volumes on this storage servier.
+Create a limited pool which will contain the storage volumes on this storage server.
 
 `zfs create storage-server/storage/projects`
 
