@@ -28,6 +28,7 @@ Help()
    echo "       octopus ALL= NOPASSWD: /bin/systemctl restart zfs-mount.service"
    echo "       octopus ALL= NOPASSWD: /usr/bin/chown -R 434400500\:434412651 /to1-s-fs-smb1/* "
    echo "       octopus ALL= NOPASSWD: /usr/bin/setfacl -R --set-file acl_template.txt /to1-s-fs-smb1/cases/* "
+   echo "       octopus ALL= NOPASSWD: /usr/bin/mkdir /to1-s-fs-smb1/cases/* "
    echo
    echo "Syntax: zfs_create_encrypted_dataset -p <DATASET_PARENT>"
    echo "options:"
