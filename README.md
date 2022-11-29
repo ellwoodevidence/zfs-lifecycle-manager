@@ -53,7 +53,12 @@ Create an unprivileged deployment user. We will use the name `octopus`.
 We will not grant this user permissions to configure mountpoints, however, they will be able to restart the systemd `zfs-mount` service after creating new datasets.
 
 run `visudo` and add the following line:
-`octopus ALL= NOPASSWD: /bin/systemctl restart zfs-mount.service`
+```
+octopus ALL= NOPASSWD: /bin/systemctl restart zfs-mount.service
+octopus ALL= NOPASSWD: /usr/bin/chown -R 434400500\:434412651 /storage-server/*
+octopus ALL= NOPASSWD: /usr/bin/setfacl -R --set-file acl_template.txt /storage-server/storage/*
+octopus ALL= NOPASSWD: /usr/bin/mkdir /storage-server/storage/*
+```
 
 
 ### Setup ZFS Dataset Permissions
