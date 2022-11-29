@@ -36,6 +36,7 @@ Help()
    echo "i                      Project ShortCode id ( e.g. ABC210101)"
    echo "c                      Project ClientCode ( e.g. ABC)"
    echo "n                      Project ShortName ( e.g. 'Johnson Apples')"
+   echo "f                      Folders to create in the new dataset, comma-separated list ( e.g. \"Folder 1,Work,Evidence\""
    echo "a                  Project Dataset Asset ID (optional)."
    echo "v                      verbose mode (WARNING, prints secrets to console)"
    echo "V                  Print software version and exit."
@@ -56,7 +57,7 @@ function log () {
 
 ############################################################
 ############################################################
-# Main Program: Create New Encrypted Dataset                   #
+# Main Program: Create New Encrypted Dataset               #
 ############################################################
 ############################################################
 
@@ -90,11 +91,11 @@ OCTOPUS_OUTVARS=false
 
 
 ############################################################
-# Process the input options.                                                   #
+# Process the input options.                               #
 ############################################################
 # Get the options
 
-while getopts ":hp:i:c:n:ovVa:" option; do
+while getopts ":hp:i:c:n:of:vVa:" option; do
    case $option in
       h) # display Help
          Help
@@ -107,6 +108,8 @@ while getopts ":hp:i:c:n:ovVa:" option; do
          PROJECT_CLIENTCODE=$OPTARG;;
           n) # set parent dataset variable
          PROJECT_SHORTNAME=$OPTARG;;
+          f) # set parent dataset variable
+         CREATE_FOLDERS=$OPTARG;;
           a) # set Asset ID for inventory tracking
          PROJECT_ASSETID=$OPTARG
                  echo "parsed assets id"
@@ -128,14 +131,14 @@ done
 log "Completed parsing arguments"
 
 ############################################################
-# Check that required variables are populated                      #
-# TODO                                                                                                     #
+# Check that required variables are populated              #
+# TODO                                                     #
 ############################################################
 
 
 
 ############################################################
-# Fetch Vault Token                                                                                #
+# Fetch Vault Token                                        #
 ############################################################
 log "fetching Vault token"
 
@@ -156,7 +159,7 @@ fi
 log "fetched Vault token, $VAULT_TOKEN"
 
 ############################################################
-# Confirm Dataset does not already exist                           #
+# Confirm Dataset does not already exist                   #
 ############################################################
 
 log "Check that the $DATASET_PARENT exists"
@@ -217,7 +220,7 @@ echo "Confirmed that target dataset does not already exist ($DATASET_PATH)"
 
 
 ############################################################
-# Create Vault Secret                                                                      #
+# Create Vault Secret                                      #
 ############################################################
 
 DATASET_ENCRYPTION_PASSPHRASE=$(openssl rand -base64 18)
@@ -244,7 +247,7 @@ VAULT_UPLOAD_SECRET="{\"data\":${JSON_DATA},\"options\":{\"cas\": 0}}"
 log "Created Vault Upload Secret json blob: $VAULT_UPLOAD_SECRET"
 
 ############################################################
-# Upload Encryption Key to Vault                                                   #
+# Upload Encryption Key to Vault                           #
 ############################################################
 # The HTTPS API format here is $VAULT_ADDR/v1/<KV ENGINE>/data/<PATH TO SECRET>
 # See Further: https://www.vaultproject.io/api-docs/secret/kv/kv-v2
@@ -273,7 +276,7 @@ fi
 
 
 ############################################################
-# Update Secret Custom Metadata                                                    #
+# Update Secret Custom Metadata                            #
 ############################################################
 
 log "creating custom metatada in Vault"
@@ -420,6 +423,21 @@ log "CHECK_MOUNTED is: $CHECK_MOUNTED"
 if [ "$(echo "$CHECK_MOUNTED" | cut -f1)" = "yes" ]; 
         then
                 echo "Dataset created and mounted successfully."
+
+                #################################################
+                # Create Folders                                #
+                #################################################
+
+                IFS_OLD=$IFS
+
+                IFS=','
+                for i in $CREATE_FOLDERS; do
+                  echo "Creating Folder: $i"
+                  sudo /usr/bin/mkdir "$(echo "$CHECK_MOUNTED" | cut -f2)/$i"
+
+                done
+
+                IFS=$IFS_OLD
 
                 echo "Running permissions update across: $(echo "$CHECK_MOUNTED" | cut -f2)"
                 sudo setfacl -R --set-file acl_template.txt "$(echo "$CHECK_MOUNTED" | cut -f2)"
